@@ -1,0 +1,732 @@
+{
+  "info": {
+    "_postman_id": "demo-school-api-collection",
+    "name": "Demo School Management API",
+    "description": "Postman collection for all REST APIs in the Spring Boot Demo project — Auth, School, Branch, Student, File Management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token — set this after login"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints — register and login",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Register a new user. Role can be: ADMIN, TEACHER, STUDENT, USER"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "  pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Login and receive JWT token. Token is auto-saved to {{token}} collection variable."
+          }
+        }
+      ]
+    },
+    {
+      "name": "School",
+      "description": "CRUD operations for School",
+      "item": [
+        {
+          "name": "Create School",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schools",
+              "host": ["{{baseUrl}}"],
+              "path": ["schools"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schoolName\": \"Springfield Elementary\",\n  \"location\": \"Springfield\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new school. schoolName and location are required."
+          }
+        },
+        {
+          "name": "Update School",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schools/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["schools", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schoolName\": \"Updated School Name\",\n  \"location\": \"New Location\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update school by ID."
+          }
+        },
+        {
+          "name": "Get School By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schools/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["schools", "1"]
+            },
+            "description": "Get a single school by its ID."
+          }
+        },
+        {
+          "name": "Get All Schools (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schools?page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["schools"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get all schools with pagination."
+          }
+        },
+        {
+          "name": "Delete School",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schools/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["schools", "1"]
+            },
+            "description": "Delete school by ID."
+          }
+        },
+        {
+          "name": "Find School By Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schools/SchoolName?schoolName=Springfield Elementary",
+              "host": ["{{baseUrl}}"],
+              "path": ["schools", "SchoolName"],
+              "query": [
+                {
+                  "key": "schoolName",
+                  "value": "Springfield Elementary"
+                }
+              ]
+            },
+            "description": "Find school by school name (query param). Example: /schools/SchoolName?schoolName=Springfield Elementary"
+          }
+        },
+        {
+          "name": "Find School By Location",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schools/LocationName?schoolLocation=Springfield",
+              "host": ["{{baseUrl}}"],
+              "path": ["schools", "LocationName"],
+              "query": [
+                {
+                  "key": "schoolLocation",
+                  "value": "Springfield"
+                }
+              ]
+            },
+            "description": "Find school by location (query param). Example: /schools/LocationName?schoolLocation=Springfield"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Branch",
+      "description": "CRUD operations for Branch",
+      "item": [
+        {
+          "name": "Create Branch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/branches",
+              "host": ["{{baseUrl}}"],
+              "path": ["branches"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchName\": \"Science Branch\",\n  \"branchCode\": \"SCI-001\",\n  \"city\": \"Springfield\",\n  \"schoolId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new branch. branchName, branchCode and schoolId are required."
+          }
+        },
+        {
+          "name": "Update Branch",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/branches/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["branches", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchName\": \"Updated Branch Name\",\n  \"branchCode\": \"UPD-001\",\n  \"city\": \"New City\",\n  \"schoolId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update branch by ID."
+          }
+        },
+        {
+          "name": "Get Branch By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/branches/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["branches", "1"]
+            },
+            "description": "Get a single branch by its ID."
+          }
+        },
+        {
+          "name": "Get All Branches (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/branches?page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["branches"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get all branches with pagination."
+          }
+        },
+        {
+          "name": "Delete Branch",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/branches/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["branches", "1"]
+            },
+            "description": "Delete branch by ID."
+          }
+        },
+        {
+          "name": "Find Branch By Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/branches/BranchName?branchName=Science Branch",
+              "host": ["{{baseUrl}}"],
+              "path": ["branches", "BranchName"],
+              "query": [
+                {
+                  "key": "branchName",
+                  "value": "Science Branch"
+                }
+              ]
+            },
+            "description": "Find branch by branch name (query param). Example: /branches/BranchName?branchName=Science Branch"
+          }
+        },
+        {
+          "name": "Find Branch By Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/branches/BranchCode?branchCode=SCI-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["branches", "BranchCode"],
+              "query": [
+                {
+                  "key": "branchCode",
+                  "value": "SCI-001"
+                }
+              ]
+            },
+            "description": "Find branch by branch code (query param). Example: /branches/BranchCode?branchCode=SCI-001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student",
+      "description": "CRUD operations for Student",
+      "item": [
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student",
+              "host": ["{{baseUrl}}"],
+              "path": ["student"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentName\": \"Alice Smith\",\n  \"age\": 15,\n  \"course\": \"Mathematics\",\n  \"branchId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new student. studentName, age (min 1) and branchId are required."
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentName\": \"Alice Johnson\",\n  \"age\": 16,\n  \"course\": \"Physics\",\n  \"branchId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update student by ID."
+          }
+        },
+        {
+          "name": "Get All Students (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student?page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["student"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get all students with pagination. Defaults: page=0, size=5."
+          }
+        },
+        {
+          "name": "Get Student By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "1"]
+            },
+            "description": "Get a single student by their ID."
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "1"]
+            },
+            "description": "Delete student by ID."
+          }
+        },
+        {
+          "name": "Find Students By Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/studentName?studentName=Alice Smith",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "studentName"],
+              "query": [
+                {
+                  "key": "studentName",
+                  "value": "Alice Smith"
+                }
+              ]
+            },
+            "description": "Find students by student name (query param)."
+          }
+        },
+        {
+          "name": "Find Students By Course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/course?course=Mathematics",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "course"],
+              "query": [
+                {
+                  "key": "course",
+                  "value": "Mathematics"
+                }
+              ]
+            },
+            "description": "Find students by course (query param)."
+          }
+        },
+        {
+          "name": "Find Students By Branch ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/branch/id?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "branch", "id"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Find all students belonging to a specific branch by branch ID (query param)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "File Management",
+      "description": "Upload, download and list files. Files are saved to disk and metadata stored in DB (file_metadata table).",
+      "item": [
+        {
+          "name": "Upload File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "upload"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Select the file to upload"
+                }
+              ]
+            },
+            "description": "Upload a file (multipart/form-data, key='file'). Returns DB record: { id, originalFileName, storedFileName, contentType, fileSize, uploadedAt, downloadUrl }."
+          }
+        },
+        {
+          "name": "Download File",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/download/example.pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "download", "example.pdf"]
+            },
+            "description": "Download a file by its storedFileName. Path is looked up from the DB. Replace 'example.pdf' with the storedFileName returned by the Upload endpoint."
+          }
+        },
+        {
+          "name": "List All Uploaded Files",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files",
+              "host": ["{{baseUrl}}"],
+              "path": ["files"]
+            },
+            "description": "Returns all file records from the file_metadata table in the DB."
+          }
+        }
+      ]
+    }
+  ]
+}
