@@ -11,8 +11,8 @@
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>Smart School ERP Platform</name>
+	<description>A Spring Boot-based school management system providing REST APIs for managing students, staff, attendance, examinations, and role-based JWT authentication. Uses MySQL for persistence and exposes OpenAPI documentation.</description>
 	<url/>
 	<licenses>
 		<license/>
